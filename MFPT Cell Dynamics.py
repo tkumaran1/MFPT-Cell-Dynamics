@@ -200,5 +200,5 @@ if __name__ == "__main__":
     plt.xlabel('Age'); plt.ylabel('Mortality Rate')
     plt.legend(); plt.grid(True)
     plt.title('Model vs Synthetic Data')
-     plt.savefig("Model vs Synthetic Data.png")
+    plt.savefig("Model vs Synthetic Data.png")
 
