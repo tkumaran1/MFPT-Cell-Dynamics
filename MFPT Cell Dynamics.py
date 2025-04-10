@@ -5,7 +5,6 @@
 
 
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
 import networkx as nx
@@ -13,7 +12,6 @@ from scipy.stats import gaussian_kde, lognorm
 from scipy.optimize import curve_fit
 from scipy.special import erfc, gamma
 
-matplotlib.use('Agg')
 
 # ====================== CORE MODEL WITH EXTENSIONS ======================
 
