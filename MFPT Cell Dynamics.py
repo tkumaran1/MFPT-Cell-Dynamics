@@ -32,7 +32,7 @@ class AgingModel:
         self.β = 0.1  # Repair efficiency
         self.memory_alpha = 0.7  # Fractional derivative order
 
-    def fractional_derivative(self, X_hist, alpha):
+    def fractional_derivative(self, X_hist, alpha): 
     """Stable Grünwald-Letnikov fractional derivative with error handling"""
     n = len(X_hist)
     frac_deriv = np.zeros(n)
