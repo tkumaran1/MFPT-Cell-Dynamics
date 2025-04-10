@@ -33,18 +33,24 @@ class AgingModel:
         self.memory_alpha = 0.7  # Fractional derivative order
 
     def fractional_derivative(self, X_hist, alpha):
+    """Approximate fractional derivative using a stabilized Grünwald–Letnikov method"""
     n = len(X_hist)
     frac_deriv = np.zeros(n)
+
     for t in range(n):
         val = 0
-        for k in range(t + 1):
-            denom = gamma(k + 1) * gamma(alpha - k + 1)
-            if denom <= 0 or np.isnan(denom) or np.isinf(denom):
-                continue  # Skip invalid terms
-            coeff = (-1)**k * gamma(alpha + 1) / denom
-            val += coeff * (X_hist[t - k] if t - k >= 0 else 0)
+        for k in range(min(t + 1, 20)):  # Limit k for performance and stability
+            try:
+                denom = gamma(k + 1) * gamma(alpha - k + 1)
+                if denom <= 0 or np.isnan(denom) or np.isinf(denom):
+                    continue
+                coeff = (-1)**k * gamma(alpha + 1) / denom
+                val += coeff * (X_hist[t - k] if t - k >= 0 else 0)
+            except (ValueError, OverflowError, ZeroDivisionError):
+                continue
         frac_deriv[t] = val
-    return frac_deriv[-1]
+
+    return frac_deriv[-1]  # Return latest value only
 
     def simulate_individual(self, intervention=None, memory=False, coupled=False):
         """Simulate single individual with optional extensions"""
