@@ -33,33 +33,45 @@ class AgingModel:
         self.memory_alpha = 0.7  # Fractional derivative order
 
     def fractional_derivative(self, X_hist, alpha):
-    """Stabilized Grünwald–Letnikov derivative with error handling"""
+    """Stable Grünwald-Letnikov fractional derivative with error handling"""
     n = len(X_hist)
     frac_deriv = np.zeros(n)
+    
+    # Precompute gamma(alpha+1) once since it's constant
+    gamma_alpha_plus_1 = gamma(alpha + 1)
     
     for t in range(n):
         total = 0.0
         for k in range(min(t + 1, 20)):  # Limit terms for stability
             try:
-                # Calculate coefficients safely
-                gamma_num = gamma(alpha + 1)
-                gamma_den = gamma(k + 1) * gamma(alpha - k + 1)
+                # Calculate denominator components separately
+                gamma_k_plus_1 = gamma(k + 1)
+                gamma_alpha_minus_k_plus_1 = gamma(alpha - k + 1)
                 
-                # Skip invalid coefficients
-                if gamma_den <= 0 or not np.isfinite(gamma_num/gamma_den):
+                # Skip if denominator components are invalid
+                if not (np.isfinite(gamma_k_plus_1) and np.isfinite(gamma_alpha_minus_k_plus_1)):
                     continue
                     
-                coeff = ((-1)**k) * (gamma_num / gamma_den)
-                x_val = X_hist[t - k] if (t - k) >= 0 else 0.0
-                total += coeff * x_val
+                denominator = gamma_k_plus_1 * gamma_alpha_minus_k_plus_1
                 
+                # Skip division by zero or near-zero
+                if denominator < 1e-10:  # Small threshold to prevent overflow
+                    continue
+                    
+                coefficient = ((-1)**k) * gamma_alpha_plus_1 / denominator
+                x_value = X_hist[t - k] if (t - k) >= 0 else 0.0
+                term = coefficient * x_value
+                
+                # Only add finite terms to the total
+                if np.isfinite(term):
+                    total += term
+                    
             except (ValueError, ZeroDivisionError, OverflowError):
                 continue
                 
         frac_deriv[t] = total
         
     return frac_deriv[-1]  # Return only the most recent value
-
     def simulate_individual(self, intervention=None, memory=False, coupled=False):
         """Simulate single individual with optional extensions"""
         # Initialize parameters
