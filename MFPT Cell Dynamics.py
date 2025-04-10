@@ -12,6 +12,8 @@ from scipy.stats import gaussian_kde, lognorm
 from scipy.optimize import curve_fit
 from scipy.special import erfc, gamma
 
+matplotlib.use('Agg')
+
 # ====================== CORE MODEL WITH EXTENSIONS ======================
 
 class AgingModel:
@@ -171,7 +173,7 @@ def plot_results(model):
     plt.title('Network and Memory Extensions')
     
     plt.tight_layout()
-    plt.show()
+    plt.savefig("Network and Memory Extensions.png")
 
 # ====================== MAIN EXECUTION ======================
 
@@ -198,5 +200,5 @@ if __name__ == "__main__":
     plt.xlabel('Age'); plt.ylabel('Mortality Rate')
     plt.legend(); plt.grid(True)
     plt.title('Model vs Synthetic Data')
-    plt.show()
+     plt.savefig("Model vs Synthetic Data.png")
 
